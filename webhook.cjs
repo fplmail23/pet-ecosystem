@@ -21,7 +21,7 @@ const server = http.createServer((req, res) => {
       .digest('hex')
 
     if (signature !== hmac) {
-      console.log('Firma inválida')
+      console.log('Firma invalida')
       res.writeHead(401)
       return res.end('Unauthorized')
     }
@@ -39,15 +39,19 @@ const server = http.createServer((req, res) => {
     try {
       const output = execSync('/var/www/pet-ecosystem/deploy.sh', {
         timeout: 120000,
-        env: { ...process.env, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
+        env: {
+          PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          HOME: '/root',
+          GIT_SSH_COMMAND: 'ssh -i /root/.ssh/github_petapp'
+        }
       })
       console.log('Deploy exitoso:', output.toString())
     } catch (err) {
-      console.error('Deploy falló:', err.message)
+      console.error('Deploy fallo:', err.message)
     }
   })
 })
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Webhook server escuchando en puerto ${PORT}`)
+  console.log('Webhook server escuchando en puerto ' + PORT)
 })
