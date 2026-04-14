@@ -1,0 +1,25 @@
+{
+  "name": "pet-ecosystem",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "db:push": "pnpm --filter @pet/db db:push",
+    "db:migrate": "pnpm --filter @pet/db db:migrate",
+    "db:studio": "pnpm --filter @pet/db db:studio"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.0.0",
+    "prettier": "^3.0.0",
+    "@types/node": "^22.0.0"
+  }
+}
