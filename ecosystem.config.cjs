@@ -21,6 +21,19 @@ module.exports = {
       max_memory_restart: "400M",
       error_file: "/var/log/pet-api-error.log",
       out_file: "/var/log/pet-api-out.log"
+    },
+    {
+      name: "pet-webhook",
+      cwd: "/var/www/pet-ecosystem",
+      script: "webhook.cjs",
+      interpreter: "node",
+      env: {
+        WEBHOOK_SECRET: "webhook_secret_pet_2026"
+      },
+      watch: false,
+      autorestart: true,
+      error_file: "/var/log/pet-webhook-error.log",
+      out_file: "/var/log/pet-webhook-out.log"
     }
   ]
 }
