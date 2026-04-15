@@ -6,6 +6,9 @@ import { healthRoutes } from './routes/health'
 import { userRoutes } from './routes/users'
 import { petRoutes } from './routes/pets'
 import { householdRoutes } from './routes/households'
+import { adminRoutes } from './routes/admin'
+import { providerRoutes } from './routes/providers'
+import { supportRoutes } from './routes/support'
 
 const server = Fastify({
   logger: {
@@ -15,6 +18,19 @@ const server = Fastify({
       : undefined,
   },
 })
+
+server.addContentTypeParser(
+  'application/json',
+  { parseAs: 'string' },
+  function (req, body, done) {
+    try {
+      ;(req as any).rawBody = body
+      done(null, JSON.parse(body as string))
+    } catch (err) {
+      done(err as Error, undefined)
+    }
+  }
+)
 
 async function buildServer() {
   await server.register(helmet, { contentSecurityPolicy: false })
@@ -26,12 +42,13 @@ async function buildServer() {
     max: 100,
     timeWindow: '1 minute',
   })
-
   await server.register(healthRoutes, { prefix: '/health' })
   await server.register(userRoutes, { prefix: '/api/v1/users' })
   await server.register(petRoutes, { prefix: '/api/v1/pets' })
   await server.register(householdRoutes, { prefix: '/api/v1/households' })
-
+  await server.register(adminRoutes, { prefix: '/api/v1/admin' })
+  await server.register(providerRoutes, { prefix: '/api/v1/providers' })
+  await server.register(supportRoutes, { prefix: '/api/v1/support' })
   return server
 }
 
