@@ -1,5 +1,6 @@
 ﻿"use client";
 import { useState, useMemo } from "react";
+import Link from "next/link";
 
 interface User {
   id: string;
@@ -23,12 +24,10 @@ export function UsersClient({ users }: { users: User[] }) {
         name.includes(search.toLowerCase()) ||
         u.email.toLowerCase().includes(search.toLowerCase()) ||
         u.phone?.includes(search);
-
       const matchStatus =
         !statusFilter ||
         (statusFilter === "active" && u.isActive) ||
         (statusFilter === "inactive" && !u.isActive);
-
       return matchSearch && matchStatus;
     });
   }, [users, search, statusFilter]);
@@ -47,15 +46,10 @@ export function UsersClient({ users }: { users: User[] }) {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Usuarios</h1>
-          <p className="text-gray-500 mt-1">
-            {filtered.length} de {users.length} usuario{users.length !== 1 ? "s" : ""}
-          </p>
+          <p className="text-gray-500 mt-1">{filtered.length} de {users.length} usuario{users.length !== 1 ? "s" : ""}</p>
         </div>
         {(search || statusFilter) && (
-          <button
-            onClick={() => { setSearch(""); setStatusFilter(""); }}
-            className="text-sm text-indigo-600 hover:text-indigo-800"
-          >
+          <button onClick={() => { setSearch(""); setStatusFilter(""); }} className="text-sm text-indigo-600 hover:text-indigo-800">
             Limpiar filtros
           </button>
         )}
@@ -66,14 +60,10 @@ export function UsersClient({ users }: { users: User[] }) {
           <button
             key={s.label}
             onClick={() => setStatusFilter(statusFilter === s.filter ? "" : s.filter)}
-            className={`bg-white rounded-xl border p-6 text-center transition-all hover:shadow-md ${
-              statusFilter === s.filter && s.filter !== "" ? "ring-2 ring-indigo-500 border-indigo-200" : "border-gray-200"
-            }`}
+            className={`bg-white rounded-xl border p-6 text-center transition-all hover:shadow-md ${statusFilter === s.filter && s.filter !== "" ? "ring-2 ring-indigo-500 border-indigo-200" : "border-gray-200"}`}
           >
             <div className="text-3xl font-bold text-gray-900">{s.count}</div>
-            <div className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium ${s.color}`}>
-              {s.label}
-            </div>
+            <div className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium ${s.color}`}>{s.label}</div>
           </button>
         ))}
       </div>
@@ -90,9 +80,7 @@ export function UsersClient({ users }: { users: User[] }) {
                 className="w-full border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <span className="absolute left-3 top-2.5 text-gray-400 text-sm">🔍</span>
-              {search && (
-                <button onClick={() => setSearch("")} className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 text-xs">✕</button>
-              )}
+              {search && <button onClick={() => setSearch("")} className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 text-xs">✕</button>}
             </div>
             <select
               value={statusFilter}
@@ -120,19 +108,17 @@ export function UsersClient({ users }: { users: User[] }) {
                     <p className="text-sm font-medium text-gray-900">
                       {user.firstName ? `${user.firstName} ${user.lastName ?? ""}`.trim() : "Sin nombre"}
                     </p>
-                    <p className="text-xs text-gray-500">
-                      {user.email}
-                      {user.phone ? ` · ${user.phone}` : ""}
-                    </p>
+                    <p className="text-xs text-gray-500">{user.email}{user.phone ? ` · ${user.phone}` : ""}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                     {user.isActive ? "Activo" : "Inactivo"}
                   </span>
-                  <span className="text-xs text-gray-400">
-                    {new Date(user.createdAt).toLocaleDateString("es")}
-                  </span>
+                  <span className="text-xs text-gray-400">{new Date(user.createdAt).toLocaleDateString("es")}</span>
+                  <Link href={`/dashboard/users/${user.id}`} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium whitespace-nowrap">
+                    Ver detalle →
+                  </Link>
                 </div>
               </div>
             ))}
@@ -140,13 +126,9 @@ export function UsersClient({ users }: { users: User[] }) {
         ) : (
           <div className="p-12 text-center text-gray-400">
             <div className="text-5xl mb-3">🔍</div>
-            <p className="text-sm font-medium">
-              {users.length === 0 ? "No hay usuarios registrados aun" : "No hay resultados para esta busqueda"}
-            </p>
+            <p className="text-sm font-medium">{users.length === 0 ? "No hay usuarios registrados aun" : "No hay resultados"}</p>
             {(search || statusFilter) && (
-              <button onClick={() => { setSearch(""); setStatusFilter(""); }} className="text-xs text-indigo-600 mt-2 hover:underline">
-                Limpiar filtros
-              </button>
+              <button onClick={() => { setSearch(""); setStatusFilter(""); }} className="text-xs text-indigo-600 mt-2 hover:underline">Limpiar filtros</button>
             )}
           </div>
         )}
