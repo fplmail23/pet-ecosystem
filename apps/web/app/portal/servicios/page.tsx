@@ -9,7 +9,10 @@
   ];
   return (
     <div>
-      <div className="mb-6"><h1 className="text-2xl font-bold text-gray-900">Servicios</h1><p className="text-gray-500 mt-1">Encuentra los mejores proveedores cerca de ti</p></div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Servicios</h1>
+        <p className="text-gray-500 mt-1">Encuentra los mejores proveedores cerca de ti</p>
+      </div>
       <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-6">
         <input type="text" placeholder="Buscar clinicas, paseadores, tiendas..." className="w-full text-sm focus:outline-none text-gray-700" />
       </div>
