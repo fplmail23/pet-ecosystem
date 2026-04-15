@@ -1,4 +1,5 @@
 ﻿import { currentUser, auth } from "@clerk/nextjs/server";
+import Link from "next/link";
 
 async function getStats(token: string) {
   try {
@@ -7,36 +8,33 @@ async function getStats(token: string) {
       cache: "no-store",
     });
     if (!res.ok) return null;
-    const json = await res.json();
-    return json.data;
-  } catch {
-    return null;
-  }
+    return (await res.json()).data;
+  } catch { return null; }
 }
 
 async function getApiHealth() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/health`, { cache: "no-store" });
     return await res.json();
-  } catch {
-    return { status: "error" };
-  }
+  } catch { return { status: "error" }; }
 }
+
+const TYPE_LABELS: Record<string, string> = {
+  CLINIC: "Clinica", STORE: "Tienda", WALKER: "Paseador",
+  GROOMING: "Grooming", DAYCARE: "Daycare", BOARDING: "Boarding", OTHER: "Otro"
+};
 
 export default async function DashboardPage() {
   const user = await currentUser();
   const { getToken } = await auth();
   const token = await getToken();
-  const [stats, health] = await Promise.all([
-    getStats(token ?? ""),
-    getApiHealth(),
-  ]);
+  const [stats, health] = await Promise.all([getStats(token ?? ""), getApiHealth()]);
 
   const cards = [
     { title: "Usuarios registrados", value: stats?.totalUsers ?? 0, icon: "👥", color: "bg-blue-50 border-blue-200" },
     { title: "Proveedores activos", value: stats?.totalProviders ?? 0, icon: "🏢", color: "bg-green-50 border-green-200" },
-    { title: "Reservas hoy", value: stats?.totalBookingsToday ?? 0, icon: "📅", color: "bg-purple-50 border-purple-200" },
-    { title: "Ingresos del mes", value: `$${stats?.totalRevenueMonth ?? 0}`, icon: "💰", color: "bg-amber-50 border-amber-200" },
+    { title: "Pendientes aprobacion", value: stats?.pendingProviders ?? 0, icon: "⏳", color: "bg-amber-50 border-amber-200" },
+    { title: "Ingresos del mes", value: `$${stats?.totalRevenueMonth ?? 0}`, icon: "💰", color: "bg-purple-50 border-purple-200" },
   ];
 
   return (
@@ -49,6 +47,7 @@ export default async function DashboardPage() {
           <span className="text-gray-500">API {health.status === "ok" ? "operacional" : "con problemas"}</span>
         </div>
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {cards.map((card) => (
           <div key={card.title} className={`rounded-xl border p-6 ${card.color}`}>
@@ -58,9 +57,13 @@ export default async function DashboardPage() {
           </div>
         ))}
       </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Usuarios recientes</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Usuarios recientes</h2>
+            <Link href="/dashboard/users" className="text-sm text-indigo-600 hover:text-indigo-800">Ver todos →</Link>
+          </div>
           {stats?.recentUsers?.length > 0 ? (
             <div className="space-y-3">
               {stats.recentUsers.map((u: any) => (
@@ -80,12 +83,32 @@ export default async function DashboardPage() {
             </div>
           )}
         </div>
+
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Proveedores pendientes</h2>
-          <div className="text-center py-8 text-gray-400">
-            <div className="text-4xl mb-2">🏢</div>
-            <p className="text-sm">No hay proveedores pendientes</p>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Proveedores pendientes</h2>
+            <Link href="/dashboard/providers" className="text-sm text-indigo-600 hover:text-indigo-800">Ver todos →</Link>
           </div>
+          {stats?.recentPendingProviders?.length > 0 ? (
+            <div className="space-y-3">
+              {stats.recentPendingProviders.map((p: any) => (
+                <div key={p.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{p.tradeName}</p>
+                    <p className="text-xs text-gray-500">{TYPE_LABELS[p.providerType] ?? p.providerType}</p>
+                  </div>
+                  <Link href={`/dashboard/providers/${p.id}`} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                    Revisar →
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-400">
+              <div className="text-4xl mb-2">🏢</div>
+              <p className="text-sm">No hay proveedores pendientes</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
