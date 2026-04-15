@@ -9,8 +9,7 @@ async function getProvider(id: string, token: string) {
       cache: "no-store",
     });
     if (!res.ok) return null;
-    const json = await res.json();
-    return json.data;
+    return (await res.json()).data;
   } catch { return null; }
 }
 
@@ -32,10 +31,15 @@ const STATUS_LABELS: Record<string, string> = {
   REJECTED: "Rechazado", SUSPENDED: "Suspendido", INACTIVE: "Inactivo"
 };
 
-export default async function ProviderDetailPage({ params }: { params: { id: string } }) {
+export default async function ProviderDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const { getToken } = await auth();
   const token = await getToken();
-  const provider = await getProvider(params.id, token ?? "");
+  const provider = await getProvider(id, token ?? "");
 
   if (!provider) {
     return (
@@ -67,12 +71,12 @@ export default async function ProviderDetailPage({ params }: { params: { id: str
               </span>
             </div>
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div><span className="text-gray-500">Tipo:</span> <span className="font-medium ml-1">{TYPE_LABELS[provider.providerType] ?? provider.providerType}</span></div>
-              <div><span className="text-gray-500">Ciudad:</span> <span className="font-medium ml-1">{provider.city ?? "—"}</span></div>
-              <div><span className="text-gray-500">Email:</span> <span className="font-medium ml-1">{provider.email ?? "—"}</span></div>
-              <div><span className="text-gray-500">Telefono:</span> <span className="font-medium ml-1">{provider.phone ?? "—"}</span></div>
-              <div><span className="text-gray-500">RUC/Tax ID:</span> <span className="font-medium ml-1">{provider.taxId ?? "—"}</span></div>
-              <div><span className="text-gray-500">Facturacion:</span> <span className="font-medium ml-1">{provider.billingType}</span></div>
+              <div><span className="text-gray-500">Tipo:</span><span className="font-medium ml-1">{TYPE_LABELS[provider.providerType] ?? provider.providerType}</span></div>
+              <div><span className="text-gray-500">Ciudad:</span><span className="font-medium ml-1">{provider.city ?? "—"}</span></div>
+              <div><span className="text-gray-500">Email:</span><span className="font-medium ml-1">{provider.email ?? "—"}</span></div>
+              <div><span className="text-gray-500">Telefono:</span><span className="font-medium ml-1">{provider.phone ?? "—"}</span></div>
+              <div><span className="text-gray-500">Tax ID:</span><span className="font-medium ml-1">{provider.taxId ?? "—"}</span></div>
+              <div><span className="text-gray-500">Facturacion:</span><span className="font-medium ml-1">{provider.billingType}</span></div>
             </div>
             {provider.description && (
               <div className="mt-4 pt-4 border-t border-gray-100">
@@ -107,12 +111,7 @@ export default async function ProviderDetailPage({ params }: { params: { id: str
         </div>
 
         <div className="space-y-6">
-          <ProviderActions
-            providerId={provider.id}
-            currentStatus={provider.status}
-            token=""
-          />
-
+          <ProviderActions providerId={provider.id} currentStatus={provider.status} token="" />
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="text-base font-semibold text-gray-900 mb-3">Informacion</h2>
             <div className="space-y-2 text-sm">
