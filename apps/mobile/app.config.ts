@@ -1,4 +1,4 @@
-import { ExpoConfig } from "expo/config";
+﻿import { ExpoConfig } from "expo/config";
 
 const config: ExpoConfig = {
   name: "PetEcosystem",
@@ -7,6 +7,7 @@ const config: ExpoConfig = {
   orientation: "portrait",
   scheme: "petecosystem",
   userInterfaceStyle: "automatic",
+  newArchEnabled: true,
   icon: "./assets/images/icon.png",
   android: {
     package: "com.petecosystem.app",
@@ -15,11 +16,8 @@ const config: ExpoConfig = {
       backgroundColor: "#ffffff"
     }
   },
-  plugins: ["expo-router"],
+  plugins: ["expo-router", "expo-font", "expo-secure-store"],
   experiments: { typedRoutes: true },
-  extra: {
-    newArchEnabled: true
-  }
 };
 
 export default config;
